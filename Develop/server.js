@@ -33,46 +33,49 @@ app.get('/api/notes', (req, res) => {
 });
 
 app.post('/api/notes', (req, res) => {
-  
-    // Unique ID
+
   var id = Date.now();
   var data = req.body;
-  
-  var note = {
+
+  const note = {
     id: id,
     title: data.title,
     text: data.text,
   };
 
 
- 
- 
   const db = fs.readFileSync(path.join(__dirname, '/db/db.json'), 'utf8');
- 
-  
-  const dbObj = JSON.parse(db);
+  const noteobj = JSON.parse(db);
 
-  dbObj.push(note);
+  noteobj.push(note);
   // Saving and returning file
-  fs.writeFileSync(path.join(__dirname, '/db/db.json'), JSON.stringify(dbObj), 'utf8');
+  fs.writeFileSync(path.join(__dirname, '/db/db.json'), JSON.stringify(noteobj), 'utf8');
   res.sendFile(path.join(__dirname, '/db/db.json'));
 });
 
-app.delete('/api/notes/:id', (req, res) => {
-   var id = req.params.id;
- 
+
+app.delete('/api/notes/:id', function (req, res) {
+  res.send('Got a DELETE request for id ' + req.params.id);
+
+  let temp = [];
+
   const db = fs.readFileSync(path.join(__dirname, '/db/db.json'), 'utf8');
-  const dbObj = JSON.parse(db);
-  for (let x = 0; x < dbObj.length; x++) {
-    if (dbObj[x].id.toString() === id) {
-      dbObj.splice(x, 1);
-      break;
+  var noteobj = JSON.parse(db);
+
+  noteobj.map(e => {
+    if (e.id != req.params.id) {
+      temp.push(e)
     }
-  }
-    // Saving and returning file
-  fs.writeFileSync(path.join(__dirname, '/db/db.json'), JSON.stringify(dbObj), 'utf8');
-  res.sendFile(path.join(__dirname, '/db/db.json'));
-});
+  })
+
+  noteobj = temp;
+
+  fs.writeFileSync('./db/db.json', JSON.stringify(noteobj), (err) => {
+    if (err) throw err;
+    console.log("Write Status: Success")
+  })
+  res.end();
+})
 
 
 // Starts the server to begin listening
