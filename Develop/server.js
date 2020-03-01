@@ -29,14 +29,13 @@ app.get('/notes', (req, res) => {
 });
 
 app.get('/api/notes', (req, res) => {
-  // Return the DB file
   res.sendFile(path.join(__dirname, '/db/db.json'));
 });
 
 app.post('/api/notes', (req, res) => {
   
     // Unique ID
-  const id = Date.now();
+  var id = Date.now();
   var data = req.body;
   
   var note = {
@@ -52,13 +51,32 @@ app.post('/api/notes', (req, res) => {
  
   
   const dbObj = JSON.parse(db);
-  
+
   dbObj.push(note);
   // Saving and returning file
   fs.writeFileSync(path.join(__dirname, '/db/db.json'), JSON.stringify(dbObj), 'utf8');
   res.sendFile(path.join(__dirname, '/db/db.json'));
 });
 
+app.delete('/api/notes/:id', (req, res) => {
+   var id = req.params.id;
+ 
+  const db = fs.readFileSync(path.join(__dirname, '/db/db.json'), 'utf8');
+  const dbObj = JSON.parse(db);
+  for (let x = 0; x < dbObj.length; x++) {
+    if (dbObj[x].id.toString() === id) {
+      dbObj.splice(x, 1);
+      break;
+    }
+  }
+    // Saving and returning file
+  fs.writeFileSync(path.join(__dirname, '/db/db.json'), JSON.stringify(dbObj), 'utf8');
+  res.sendFile(path.join(__dirname, '/db/db.json'));
+});
+
+
+// Starts the server to begin listening
+// =============================================================
 app.listen(PORT, () => {
   console.log(`App listening on PORT ${PORT}`);
 });
