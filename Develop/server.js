@@ -35,19 +35,24 @@ app.get('/api/notes', (req, res) => {
 
 app.post('/api/notes', (req, res) => {
   
+    // Unique ID
+  const id = Date.now();
+  var data = req.body;
+  
   var note = {
     id: id,
     title: data.title,
     text: data.text,
   };
 
-  // Unique ID
-  const id = Date.now();
-  var data = req.body;
+
+ 
+ 
   const db = fs.readFileSync(path.join(__dirname, '/db/db.json'), 'utf8');
  
   
   const dbObj = JSON.parse(db);
+  
   dbObj.push(note);
   // Saving and returning file
   fs.writeFileSync(path.join(__dirname, '/db/db.json'), JSON.stringify(dbObj), 'utf8');
